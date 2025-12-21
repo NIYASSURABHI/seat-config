@@ -20,35 +20,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     riderType,
     color,
     features,
+    quantity,
+    requestType,
   } = req.body || {};
 
   if (!fullName || !email || !seatType) return res.status(400).json({ error: 'Missing fields' });
 
+  const reqLabel =
+    requestType === 'ga' ? 'GA Drawing' : requestType === 'quote' ? 'Quote' : 'Submit';
+
   const html = `
-    <h2>AAE Seat Configurator</h2>
-    <p><b>${seatType}${riderType ? ' / ' + riderType : ''}</b></p>
-    <h3>Customer</h3>
-    <ul>
-      <li><b>Name:</b> ${fullName}</li>
-      <li><b>Org:</b> ${organisation || '-'}</li>
-      <li><b>Email:</b> ${email}</li>
-      <li><b>Phone:</b> ${phone || '-'}</li>
-    </ul>
-    <h3>Selection</h3>
-    <ul>
-      <li><b>Colour:</b> ${color || '-'}</li>
-      <li><b>Options:</b> ${
-        Array.isArray(features) && features.length ? features.join(', ') : 'None'
-      }</li>
-    </ul>
-    ${tellMore ? `<h3>Notes</h3><p>${(tellMore + '').replace(/\n/g, '<br/>')}</p>` : ''}
+    <h2>Request: ${reqLabel}</h2>
+    <h3>Customer Details:</h3>
+    <p>Name: ${fullName || '-'}</p>
+    <p>Organisation: ${organisation || '-'}</p>
+    <p>Mail Address: ${email || '-'}</p>
+    <p>Phone Number: ${phone || '-'}</p>
+    <p>How did you hear about us: ${hearAbout || '-'}</p>
+    <p>Preferred Contact Method: ${contactMethod || '-'}</p>
+
+    <h3>Specification:</h3>
+    <p>Type: ${seatType}</p>
+    <p>Variant: ${riderType || '-'}</p>
+    ${(Array.isArray(features) && features.length ? features : ['None'])
+      .map((f: string) => `<p>${f}</p>`)
+      .join('')}
+    <p>Colour: ${color || '-'}</p>
+    <p>Quantity: ${quantity ?? '-'}</p>
+    <p>Optional Comments: ${tellMore ? (tellMore + '').replace(/\n/g, '<br/>') : '-'}</p>
   `;
 
   const { error } = await resend.emails.send({
     from: process?.env?.FROM_EMAIL,
     to: process?.env?.TO_EMAIL,
     replyTo: email,
-    subject: `Seat Configurator – ${seatType}${riderType ? ' / ' + riderType : ''}`,
+    subject: `Seat Configurator – ${reqLabel} – ${seatType}${riderType ? ' / ' + riderType : ''}`,
     html,
   });
   if (error) return res.status(502).json({ error: error.message });

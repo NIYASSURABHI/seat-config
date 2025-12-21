@@ -317,8 +317,8 @@
       </div>
 
       <div class="review-actions">
-        <button class="btn" type="button">Request for GA Drawing</button>
-        <button class="btn" type="button">Request for Quote</button>
+        <button class="btn" type="button" (click)="setRequestType('ga')">Request for GA Drawing</button>
+        <button class="btn" type="button" (click)="setRequestType('quote')">Request for Quote</button>
         <button class="btn next" type="button" (click)="submit()">Submit</button>
       </div>
     </section>
@@ -336,6 +336,6 @@
   </form>
 
   <footer class="footer">
-    <small>© Exhibition Demo</small>
+    <small>© AAE - Seat Configurator</small>
   </footer>
 </div>

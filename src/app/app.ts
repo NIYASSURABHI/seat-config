@@ -23,6 +23,7 @@ type Family = 'blastrider' | 'crewrider';
 type Rider = 'driver' | 'crew' | 'light_weight';
 type Color = 'black' | 'green' | 'tan';
 type Feature = 'headrest' | 'whiplash_bar' | 'armrest' | 'footrest' | 'bms';
+type RequestKind = 'ga' | 'quote' | 'submit';
 
 @Component({
   selector: 'app-root',
@@ -86,6 +87,7 @@ export class App implements OnInit {
 
   // gallery
   galleryUrls: string[] = [];
+  requestType: RequestKind = 'submit';
 
   constructor(private fb: FormBuilder, private assets: ManifestService, private http: HttpClient) {
     this.form = this.fb.nonNullable.group({
@@ -153,6 +155,10 @@ export class App implements OnInit {
     }
   }
 
+  setRequestType(kind: RequestKind) {
+    this.requestType = kind;
+  }
+
   async submit() {
     const payload = {
       fullName: this.form.value.fullName,
@@ -167,10 +173,12 @@ export class App implements OnInit {
       color: this.colors,
       features: Array.from(this.selected),
       quantity: this.specQuantity(),
+      requestType: this.requestType,
     };
     try {
       await this.http.post('/api/send', payload).toPromise();
       this.step = this.Step.Success;
+      this.requestType = 'submit';
       this.scrollTop();
     } catch (err) {
       console.error('Email failed', err);
