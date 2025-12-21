@@ -324,7 +324,12 @@ export class App implements OnInit {
   }
 
   specColour(): string {
-    return this.colors;
+    const map: Record<Color, string> = {
+      black: 'BLACK - CODE 17',
+      green: 'GREEN - CODE 4M',
+      tan: 'TAN - CODE 2A',
+    };
+    return map[this.colors] || this.colors.toUpperCase();
   }
 
   specQuantity(): number {
