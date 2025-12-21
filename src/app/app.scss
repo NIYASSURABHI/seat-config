@@ -1,0 +1,985 @@
+@use 'sass:color';
+
+$page-max: 1280px;
+$primary: #2a2a2a;
+$accent: #d62027;
+$bg: #fdfdfd;
+$text: #111;
+$muted: #4a4a4a;
+$danger: #d14343;
+$card: #f8f8f8;
+
+* {
+  box-sizing: border-box;
+}
+
+.page {
+  min-height: 100vh;
+  background: $bg;
+  color: $text;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 56px; /* keep room for footer */
+  font-family: 'Oswald', 'Barlow Condensed', 'Segoe UI', Arial, sans-serif;
+  letter-spacing: 0.2px;
+  overflow-x: hidden;
+}
+
+.topbar {
+  width: 100%;
+  max-width: $page-max;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  .brand-title {
+    font-weight: 800;
+    font-size: 30px;
+    letter-spacing: 0.6px;
+  }
+  .brand-logo {
+    width: 140px;
+    height: auto;
+    object-fit: contain;
+  }
+}
+
+.stepper {
+  width: 100%;
+  max-width: $page-max;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 8px 0 16px;
+  div {
+    background: #e7eaf3;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    text-align: center;
+    &.active {
+      background: $primary;
+      color: #fff;
+      font-weight: 700;
+    }
+  }
+}
+
+.card {
+  width: 100%;
+  max-width: $page-max;
+  background: $card;
+  border-radius: 22px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
+  margin-top: 10px;
+}
+
+.card--mock {
+  border: 3px solid $accent;
+  max-width: min($page-max, 100%);
+  min-height: clamp(520px, calc(100vh - 220px), 780px);
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: visible;
+}
+
+.card--scroll {
+  max-height: calc(100vh - 240px);
+  overflow: auto;
+}
+
+.card-title {
+  margin: 6px 0 18px;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.info-card .card-title {
+  margin-bottom: 14px;
+  font-size: 30px;
+}
+
+/* form rows */
+.form-row {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.form-label {
+  text-align: left;
+  padding-left: 12px;
+  font-weight: 700;
+  font-size: 20px;
+  color: #0f0f0f;
+}
+
+.req {
+  color: $accent;
+}
+
+.form-field {
+  position: relative;
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 13px 16px;
+    border: 2px solid #b5b5b5;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 500;
+    background: linear-gradient(180deg, #f7f7f7 0%, #e2e2e2 100%);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.18), 0 6px 12px rgba(0, 0, 0, 0.04);
+    &:focus {
+      outline: none;
+      border-color: color.adjust($accent, $lightness: -6%);
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 4px rgba($accent, 0.12);
+    }
+  }
+
+  select {
+    appearance: none;
+    background-image: linear-gradient(180deg, #f7f7f7 0%, #e2e2e2 100%),
+      linear-gradient(45deg, transparent 50%, #666 50%),
+      linear-gradient(135deg, #666 50%, transparent 50%);
+    background-position: 0 0, calc(100% - 22px) 50%, calc(100% - 16px) 50%;
+    background-size: auto, 8px 8px, 8px 8px;
+    background-repeat: no-repeat;
+  }
+}
+
+.consent-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 10px 0 0 12px;
+  label {
+    line-height: 1.45;
+    font-size: 15px;
+    color: $muted;
+  }
+}
+
+.err {
+  color: $danger;
+  font-size: 13px;
+}
+
+.no-images {
+  text-align: center;
+  color: $muted;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 10px 0 0;
+}
+
+/* pills */
+.pill-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.pill-option {
+  input {
+    display: none;
+  }
+
+  .pill-label {
+    display: inline-block;
+    min-width: 220px;
+    text-align: center;
+    padding: 14px 26px;
+    border-radius: 999px;
+    border: 2px solid #8e95a3;
+    background: #fdfdfd;
+    color: #1f2430;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12), 0 10px 20px rgba(0, 0, 0, 0.06);
+    transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.12s ease, color 0.12s ease,
+      border-color 0.12s ease;
+  }
+
+  input:checked + .pill-label {
+    background: #8b92a1;
+    color: #101010;
+    border-color: #6f7785;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2) inset, 0 12px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(1px);
+  }
+}
+
+.seat-err {
+  display: block;
+  text-align: left;
+  margin-left: 24px;
+  margin-top: 6px;
+}
+
+/* gallery */
+.gallery {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin: 14px 0 8px;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
+  position: relative;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  -ms-overflow-style: none;
+  padding-bottom: 6px; /* room for scrollbar */
+  img {
+    flex: 0 0 auto;
+    width: 340px;
+    height: 210px;
+    max-width: 92vw;
+    display: block;
+    border: 1px solid #e5e7ef;
+    border-radius: 12px;
+    object-fit: contain;
+    background: #fff;
+  }
+}
+
+/* color row + dots */
+.color-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  gap: 14px;
+}
+
+.color-dots {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-row .actions {
+  margin-top: 0;
+  justify-content: center;
+}
+
+.dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 2px solid #1f2937;
+  background: #111;
+  cursor: pointer;
+  &.sand {
+    background: #e5c9a1;
+  }
+  &.green {
+    background: #254a27;
+  }
+  &.active {
+    outline: 3px solid rgba(0, 0, 0, 0.18);
+  }
+}
+
+/* actions */
+.actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.actions--center {
+  justify-content: center;
+}
+
+.actions--end {
+  justify-content: flex-end;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}
+
+.btn {
+  background: #d3d3d3;
+  color: #0f0f0f;
+  border: 2px solid #a9a9a9;
+  padding: 14px 24px;
+  border-radius: 18px;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+}
+
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.next {
+  background: linear-gradient(180deg, #d7d7d7 0%, #a8a8a8 100%);
+  color: #1a1a1a;
+  border-color: #8f8f8f;
+}
+
+.success {
+  text-align: center;
+}
+
+/* Review */
+.review-card .card-title {
+  margin-bottom: 16px;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 18px;
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.review-section-title {
+  font-weight: 900;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.spec-line {
+  font-size: 16px;
+  margin: 6px 0;
+}
+
+.quantity-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.qty-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty-controls input {
+  width: 70px;
+  text-align: center;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 2px solid #b5b5b5;
+  font-size: 15px;
+}
+
+.qty-controls button {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 2px solid #a9a9a9;
+  background: linear-gradient(180deg, #d7d7d7 0%, #a8a8a8 100%);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.35);
+}
+
+.spec-bullets {
+  margin: 8px 0 10px 18px;
+}
+
+.spec-muted {
+  color: $muted;
+  font-weight: 700;
+  margin: 6px 0 10px;
+}
+
+.review-notes {
+  min-height: 0;
+}
+
+.review-notes textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 14px 16px;
+  border: 2px solid #b5b5b5;
+  border-radius: 14px;
+  font-size: 16px;
+  background: #fff;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.review-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+/* Success */
+.success-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.success-bubble {
+  max-width: 720px;
+  background: linear-gradient(180deg, #d7d7d7 0%, #a8a8a8 100%);
+  border: 2px solid #8f8f8f;
+  border-radius: 26px;
+  padding: 24px 26px;
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.4;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+}
+
+/* Customer info specific tweaks */
+.info-card {
+  position: relative;
+  padding: 22px 28px 18px;
+  background: linear-gradient(180deg, #fbfbfb 0%, #f0f0f0 100%);
+}
+
+.info-card .form-row {
+  padding-left: 10px;
+}
+
+.info-card .actions {
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 10px;
+  padding-bottom: 6px;
+}
+
+.info-card .btn.next {
+  min-width: 180px;
+}
+
+/* Compact sizing to keep CTA visible without scrolling */
+.info-card .form-row {
+  grid-template-columns: 230px 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.info-card .form-label {
+  font-size: 17px;
+  padding-left: 8px;
+}
+
+.info-card .form-field input,
+.info-card .form-field select {
+  padding: 10px 14px;
+  font-size: 15px;
+}
+
+.info-card .consent-row {
+  margin-top: 6px;
+  label {
+    font-size: 14px;
+  }
+}
+
+.seat-type-card {
+  padding: 28px 32px 36px;
+}
+
+.seat-type-card .pill-group {
+  margin-top: 22px;
+  margin-bottom: 56px;
+}
+
+.seat-type-card .actions {
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+/* Rider (Variant) */
+.rider-card .color-row {
+  margin-top: 16px;
+  padding-bottom: 12px;
+}
+
+.rider-card.rider-empty .color-row {
+  display: none;
+}
+
+.rider-card .rider-actions-empty {
+  margin-top: auto;
+  padding-bottom: 6px;
+}
+
+.rider-card .actions {
+  margin-top: 24px;
+  padding-bottom: 16px;
+}
+
+.rider-card.rider-empty .actions {
+  margin-top: 32px;
+  padding-bottom: 0;
+}
+
+.rider-card {
+  min-height: auto;
+  padding-bottom: 16px; /* IMPORTANT: reduce default bottom padding */
+  &.rider-empty {
+    min-height: 480px;
+    padding-bottom: 40px;
+  }
+}
+
+.rider-card.rider-empty {
+  padding: 28px 32px 36px; /* same as .seat-type-card */
+  min-height: clamp(520px, calc(100vh - 220px), 780px);
+  padding-bottom: 40px;
+}
+
+.rider-card.rider-empty .pill-group {
+  margin-top: 22px;
+  margin-bottom: 56px;
+}
+
+.rider-card.rider-empty .rider-actions-empty {
+  margin-top: 32px;
+  padding-bottom: 0;
+}
+
+.rider-card .gallery {
+  gap: 14px;
+  margin: 14px 0 12px;
+}
+
+.rider-card.rider-empty .gallery {
+  display: none;
+}
+
+.rider-card .gallery img {
+  width: 320px;
+  height: 200px;
+}
+
+/* Options */
+.options-card .color-row {
+  margin-top: auto;
+}
+
+.options-card .pill-group {
+  gap: 12px;
+  margin: 12px 0 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.options-card .pill-option .pill-label {
+  min-width: 180px;
+  padding: 12px 18px;
+  width: 100%;
+}
+
+.options-card .actions {
+  margin-top: 24px;
+  padding-bottom: 16px;
+}
+
+.options-card .gallery {
+  gap: 10px;
+  margin: 10px 0 16px;
+}
+
+.options-card .gallery img {
+  width: 320px;
+  height: 200px;
+}
+
+/* Footer (single source of truth) */
+.footer {
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+  padding: 6px 0 0;
+  color: $muted;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .card--mock {
+    height: auto;
+    overflow: visible;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 18px;
+    padding: 18px 16px 20px;
+  }
+
+  .page {
+    padding: 16px 12px 40px;
+  }
+
+  .topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    .brand-title {
+      font-size: 26px;
+    }
+    .brand-logo {
+      width: 104px;
+      margin-left: auto;
+    }
+  }
+
+  /* Stepper becomes wrapped on mobile */
+  .stepper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    overflow: visible;
+    padding: 2px 0 6px;
+    justify-content: center;
+    div {
+      white-space: nowrap;
+      min-width: 44%;
+      flex: 1 1 44%;
+      margin-bottom: 6px;
+      max-width: 48%;
+    }
+  }
+
+  .card--scroll {
+    max-height: calc(100vh - 200px);
+  }
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .form-label {
+    text-align: left;
+    font-size: 16px;
+    margin-bottom: 2px;
+  }
+
+  .consent-row {
+    margin-left: 0;
+  }
+
+  .gallery {
+    gap: 8px;
+    margin: 6px 0 4px;
+    width: 100%;
+    padding: 0 6px 4px;
+    overflow-x: auto !important;
+    touch-action: pan-x;
+  }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    padding: 12px 14px;
+    font-size: 16px;
+    width: 100%;
+  }
+
+  .review-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .review-actions {
+    flex-wrap: wrap;
+  }
+
+  .pill-group {
+    gap: 14px;
+    justify-content: center;
+  }
+
+  .pill-option .pill-label {
+    min-width: 160px;
+    padding: 12px 18px;
+  }
+
+  .card-title {
+    font-size: 28px;
+  }
+
+  .info-card .card-title {
+    font-size: 26px;
+  }
+
+  .gallery img {
+    width: 260px;
+    height: 170px;
+    max-width: 92vw;
+  }
+
+  .rider-card .gallery img,
+  .options-card .gallery img {
+    width: 260px;
+    height: 170px;
+    max-width: 92vw;
+  }
+
+  .review-grid {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .stepper div {
+    min-width: 160px;
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+
+  .card {
+    padding: 18px 16px 20px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .card-title {
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+
+  .pill-option .pill-label {
+    min-width: 140px;
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+
+  .gallery {
+    gap: 8px;
+    margin: 8px 0 4px;
+    width: calc(100vw - 24px);
+    margin-left: -12px;
+    margin-right: -12px;
+    touch-action: pan-x;
+    overflow-x: auto !important;
+  }
+
+  .rider-card .gallery img,
+  .options-card .gallery img {
+    width: 240px;
+    height: 160px;
+    max-width: none;
+  }
+
+  .color-row {
+    margin-top: 14px;
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 12px 18px;
+    border-radius: 16px;
+  }
+
+  .success-bubble {
+    font-size: 16px;
+    padding: 18px 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar .brand-title {
+    font-size: 22px;
+  }
+
+  .stepper div {
+    min-width: 140px;
+  }
+
+  .pill-option .pill-label {
+    min-width: 120px;
+  }
+
+  .gallery img {
+    width: 220px;
+    height: 150px;
+    max-width: 92vw;
+  }
+}
+
+/* --- Layout tuning for Variant vs Options --- */
+
+/* Keep Variant card behaving like a content-sized card (so footer stays visible) */
+.rider-card:not(.rider-empty) {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px; /* small gap before footer */
+}
+
+.rider-card:not(.rider-empty) .pill-group + div {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.rider-card:not(.rider-empty) .color-row {
+  margin-top: auto;
+  padding-bottom: 16px;
+}
+
+.rider-card:not(.rider-empty) .gallery {
+  gap: 10px;
+  margin: 10px 0 16px;
+}
+
+.rider-card:not(.rider-empty) .gallery img {
+  width: 320px;
+  height: 200px;
+}
+
+/* Options can keep a controlled min-height feel */
+.options-card.card--mock {
+  min-height: clamp(420px, calc(100vh - 420px), 660px);
+  margin-bottom: 12px;
+}
+
+/* CRITICAL: Variant (non-empty) must override .card--mock clamp */
+.rider-card.card--mock:not(.rider-empty) {
+  min-height: unset !important;
+  height: auto;
+  padding-bottom: 16px !important;
+  margin-bottom: 8px;
+}
+.rider-card.card--mock:not(.rider-empty),
+.options-card.card--mock,
+.review-card.card--mock {
+  padding-left: clamp(18px, 2.2vw, 32px);
+  padding-right: clamp(18px, 2.2vw, 32px);
+}
+/* STEP 2: Review page - give bottom breathing room so buttons don't touch border */
+.review-card.card--mock {
+  padding-bottom: clamp(18px, 2.2vw, 32px);
+}
+
+.page > form {
+  width: 100%;
+  max-width: $page-max;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* cards fill the form width */
+}
+
+/* =========================================================
+   FINAL FIXES: Gallery centering + No-images + Mobile layout
+   Paste at END of app.scss
+   ========================================================= */
+
+/* Center galleries when content doesn't fill the row */
+.gallery {
+  justify-content: center;
+}
+
+/* Prevent content from visually spilling past the red border on Options */
+.options-card.card--mock {
+  overflow: hidden;
+}
+
+/* ----- OPTIONS: pill layout must be a stable grid (no overlap) ----- */
+/* Replace auto-fit behavior with predictable columns */
+.options-card .pill-group {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  justify-items: stretch;
+  align-items: center;
+}
+
+/* Critical: remove min-width constraints that cause overlap */
+.options-card .pill-option {
+  width: 100%;
+}
+.options-card .pill-option .pill-label {
+  width: 100%;
+  min-width: 0 !important;
+}
+
+/* Keep Options gallery nicely centered and inside border */
+.options-card .gallery {
+  justify-content: center;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* ----- MOBILE: stop the gallery from breaking the right border ----- */
+/* Your existing @media <=600 sets width: calc(100vw - 24px) + negative margins.
+   That "full bleed" effect breaks the red bordered card. Override it only INSIDE cards. */
+@media (max-width: 900px) {
+  .options-card .pill-group {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .card--mock .gallery {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Give the card extra inner breathing room so border never touches content */
+  .options-card.card--mock {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  /* Options buttons: 2-column grid, no overlap */
+  .options-card .pill-group {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .options-card .pill-option .pill-label {
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+
+  /* Gallery must remain inside the red border (no negative margins / viewport width) */
+  .card--mock .gallery {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 4px 6px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  /* On very small screens, stack options for perfect spacing */
+  .options-card .pill-group {
+    grid-template-columns: 1fr;
+  }
+}
