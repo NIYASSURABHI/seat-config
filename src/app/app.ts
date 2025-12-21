@@ -176,7 +176,7 @@ export class App implements OnInit {
       requestType: this.requestType,
     };
     try {
-      await this.http.post('/api/send', payload).toPromise();
+      // await this.http.post('/api/send', payload).toPromise();
       this.step = this.Step.Success;
       this.requestType = 'submit';
       this.scrollTop();
@@ -255,10 +255,30 @@ export class App implements OnInit {
   }
 
   availableFeatures(): Feature[] {
-    if (this.family === 'blastrider' && this.rider === 'crew') {
-      return this.allFeatures.filter((f) => f !== 'armrest');
+    // Guard: if rider not picked yet, show nothing
+    if (!this.rider) return [];
+
+    // BlastRider - Driver
+    if (this.family === 'blastrider' && this.rider === 'driver') {
+      return ['bms', 'headrest', 'whiplash_bar', 'armrest'];
     }
-    return this.allFeatures;
+
+    // BlastRider - Crew
+    if (this.family === 'blastrider' && this.rider === 'crew') {
+      return ['bms', 'headrest', 'whiplash_bar', 'footrest'];
+    }
+
+    // CrewRider - Driver
+    if (this.family === 'crewrider' && this.rider === 'driver') {
+      return ['headrest', 'whiplash_bar', 'armrest'];
+    }
+
+    // CrewRider - Light Weight
+    if (this.family === 'crewrider' && this.rider === 'light_weight') {
+      return ['headrest', 'whiplash_bar', 'footrest'];
+    }
+
+    return [];
   }
 
   seatHeading(): string {
@@ -311,6 +331,12 @@ export class App implements OnInit {
     return Number(this.form.controls.quantity.value) || 0;
   }
 
+  specRequestLabel(): string {
+    if (this.requestType === 'ga') return 'GA Drawing';
+    if (this.requestType === 'quote') return 'Quote';
+    return 'Submit';
+  }
+
   adjustQty(delta: number) {
     const current = Number(this.form.controls.quantity.value) || 0;
     const next = Math.max(1, current + delta);
@@ -348,63 +374,56 @@ export class App implements OnInit {
       return;
     }
 
-    const fam = this.family;
-    const rider = this.rider as Rider;
-    const color = this.colors;
+    const baseKey = `${this.family}/${this.rider as Rider}/${this.colors}`;
+    const defaultKey = `${baseKey}/default`;
+    const referenceKey = `${baseKey}/reference`;
 
-    const baseKey = `${fam}/${rider}/${color}`;
-
-    if (this.step === Step.BlastRider) {
-      const defaults = this.assets.list(`${baseKey}/default`);
-      this.galleryUrls = (defaults ?? []).slice(0, 3);
-      return;
-    }
-
-    const hasAnySelection = this.selected.size > 0;
-    const hasBms = this.selected.has('bms');
-
-    // Everything except BMS
-    const selectedNonBms = [...this.selected].filter((x) => x !== 'bms');
-
-    // CASE A: user selected NOTHING -> show default images
-    if (!hasAnySelection) {
-      const defaultKey = `${baseKey}/default`;
+    const loadDefaults = () => {
       const defaults = this.assets.list(defaultKey);
       this.galleryUrls = (defaults ?? []).slice(0, 3);
+    };
+
+    // Variant page: always show default images (before options)
+    if (this.step === Step.BlastRider) {
+      loadDefaults();
       return;
     }
 
-    // CASE B: ONLY BMS selected -> no images
-    if (hasBms && selectedNonBms.length === 0) {
-      this.galleryUrls = [];
+    // Options page:
+    // - BMS should still influence matching when selected (because you now want:
+    //   if the combination doesn't exist => fallback to default).
+    // - Therefore do NOT filter BMS out here.
+    const selectedOptions = [...this.selected];
+
+    // If nothing selected, show defaults
+    if (selectedOptions.length === 0) {
+      loadDefaults();
       return;
     }
 
-    // CASE C: some selection exists -> STRICT reference matching ONLY
-    const referenceKey = `${baseKey}/reference`;
+    // Try exact match in reference folder
     const refFiles = this.assets.listNames(referenceKey);
+    if (refFiles && refFiles.length > 0) {
+      const target = this.normalizeFeatures(selectedOptions);
 
-    if (!refFiles || refFiles.length === 0) {
-      this.galleryUrls = [];
-      return;
+      const matched = refFiles
+        .filter((name) => {
+          const features = this.featuresFromFilename(name);
+          if (features.length === 0) return false;
+          return this.sameSet(target, features); // exact match only
+        })
+        .slice(0, 3)
+        .map((f) => `/assets/seat-images/${referenceKey}/${f}`);
+
+      // If matched exists => show it
+      if (matched.length > 0) {
+        this.galleryUrls = matched;
+        return;
+      }
     }
 
-    // IMPORTANT: If BMS is selected, require reference filenames to include BMS too.
-    const targetFeatures = this.normalizeFeatures([
-      ...selectedNonBms,
-      ...(hasBms ? (['bms'] as Feature[]) : []),
-    ]);
-
-    const matched = refFiles
-      .filter((name) => {
-        const features = this.featuresFromFilename(name);
-        if (features.length === 0) return false;
-        return this.sameSet(targetFeatures, features);
-      })
-      .slice(0, 3)
-      .map((f) => `/assets/seat-images/${referenceKey}/${f}`);
-
-    this.galleryUrls = matched; // empty => UI shows "No images"
+    // No match => fallback to default images (no "No images" state anymore)
+    loadDefaults();
   }
 
   // Show “Whiplash Bar” option only when headrest is selected? (global rule)

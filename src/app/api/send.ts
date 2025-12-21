@@ -21,13 +21,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     color,
     features,
     quantity,
-    requestType,
+    requestTypes,
   } = req.body || {};
 
   if (!fullName || !email || !seatType) return res.status(400).json({ error: 'Missing fields' });
 
-  const reqLabel =
-    requestType === 'ga' ? 'GA Drawing' : requestType === 'quote' ? 'Quote' : 'Submit';
+  const labels =
+    Array.isArray(requestTypes) && requestTypes.length
+      ? requestTypes.map((r: string) => (r === 'ga' ? 'GA Drawing' : 'Quote'))
+      : [];
+  const reqLabel = labels.length ? labels.join(' + ') : 'No requests';
 
   const html = `
     <h2>Request: ${reqLabel}</h2>

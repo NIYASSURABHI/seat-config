@@ -235,7 +235,6 @@
         </label>
       </div>
 
-      <div class="no-images" *ngIf="selected.size > 0 && galleryUrls.length === 0">No images</div>
       <div class="gallery" *ngIf="galleryUrls.length > 0">
         <img *ngFor="let url of galleryUrls" [src]="url" alt="seat option image" />
       </div>
@@ -294,6 +293,7 @@
           <div class="spec-line"><strong>Seat Belt:</strong> {{ specSeatBelt() }}</div>
           <div class="spec-line"><strong>Fabric:</strong> {{ specFabric() }}</div>
           <div class="spec-line"><strong>Colour:</strong> {{ specColour() }}</div>
+          <div class="spec-line"><strong>Request:</strong> {{ specRequestLabel() }}</div>
           <div class="quantity-row">
             <div class="spec-line"><strong>Quantity:</strong></div>
             <div class="qty-controls">
@@ -317,8 +317,12 @@
       </div>
 
       <div class="review-actions">
-        <button class="btn" type="button" (click)="setRequestType('ga')">Request for GA Drawing</button>
-        <button class="btn" type="button" (click)="setRequestType('quote')">Request for Quote</button>
+        <button class="btn" type="button" (click)="setRequestType('ga')">
+          Request for GA Drawing
+        </button>
+        <button class="btn" type="button" (click)="setRequestType('quote')">
+          Request for Quote
+        </button>
         <button class="btn next" type="button" (click)="submit()">Submit</button>
       </div>
     </section>

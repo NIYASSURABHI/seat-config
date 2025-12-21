@@ -589,18 +589,30 @@ $card: #f8f8f8;
 }
 
 .options-card .pill-group {
-  gap: 12px;
-  margin: 12px 0 10px;
-  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1120px; /* give a bit more room inside the card */
+  margin: 12px auto 10px;
+
+  display: flex;
+  flex-wrap: nowrap; /* IMPORTANT: no wrapping on desktop */
   justify-content: center;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  align-items: center;
+  gap: 16px; /* smaller gap so all fit */
+}
+
+/* Keep each pill at a reasonable width, but allow wrap */
+.options-card .pill-option {
+  flex: 0 1 210px; /* shrinkable, but capped */
+  display: flex;
+  justify-content: center;
 }
 
 .options-card .pill-option .pill-label {
-  min-width: 180px;
-  padding: 12px 18px;
   width: 100%;
+  max-width: 210px;
+  min-width: 0 !important; /* overrides the global min-width: 220px */
+  padding: 10px 14px; /* slightly smaller */
+  font-size: 16px;
 }
 
 .options-card .actions {
@@ -808,6 +820,11 @@ $card: #f8f8f8;
     font-size: 16px;
     padding: 18px 18px;
   }
+
+  /* ✅ Options pills: tighten for small screens (still centered) */
+  .options-card .pill-option {
+    flex: 0 1 180px;
+  }
 }
 
 @media (max-width: 420px) {
@@ -827,6 +844,12 @@ $card: #f8f8f8;
     width: 220px;
     height: 150px;
     max-width: 92vw;
+  }
+
+  /* ✅ Stack options cleanly on very small screens */
+  .options-card .pill-option {
+    flex: 1 1 100%;
+    max-width: 320px;
   }
 }
 
@@ -894,8 +917,7 @@ $card: #f8f8f8;
 }
 
 /* =========================================================
-   FINAL FIXES: Gallery centering + No-images + Mobile layout
-   Paste at END of app.scss
+   FINAL FIXES: Gallery centering + Mobile layout stability
    ========================================================= */
 
 /* Center galleries when content doesn't fill the row */
@@ -906,25 +928,6 @@ $card: #f8f8f8;
 /* Prevent content from visually spilling past the red border on Options */
 .options-card.card--mock {
   overflow: hidden;
-}
-
-/* ----- OPTIONS: pill layout must be a stable grid (no overlap) ----- */
-/* Replace auto-fit behavior with predictable columns */
-.options-card .pill-group {
-  display: grid !important;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
-  justify-items: stretch;
-  align-items: center;
-}
-
-/* Critical: remove min-width constraints that cause overlap */
-.options-card .pill-option {
-  width: 100%;
-}
-.options-card .pill-option .pill-label {
-  width: 100%;
-  min-width: 0 !important;
 }
 
 /* Keep Options gallery nicely centered and inside border */
@@ -939,10 +942,11 @@ $card: #f8f8f8;
    That "full bleed" effect breaks the red bordered card. Override it only INSIDE cards. */
 @media (max-width: 900px) {
   .options-card .pill-group {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    flex-wrap: wrap; /* allow wrap on mobile */
   }
-
+  .options-card .pill-option {
+    flex: 0 1 200px;
+  }
   .card--mock .gallery {
     width: 100% !important;
     margin-left: 0 !important;
@@ -957,29 +961,11 @@ $card: #f8f8f8;
     padding-right: 14px !important;
   }
 
-  /* Options buttons: 2-column grid, no overlap */
-  .options-card .pill-group {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-
-  .options-card .pill-option .pill-label {
-    padding: 12px 14px;
-    font-size: 15px;
-  }
-
   /* Gallery must remain inside the red border (no negative margins / viewport width) */
   .card--mock .gallery {
     width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
     padding: 0 4px 6px !important;
-  }
-}
-
-@media (max-width: 420px) {
-  /* On very small screens, stack options for perfect spacing */
-  .options-card .pill-group {
-    grid-template-columns: 1fr;
   }
 }
