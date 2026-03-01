@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { ManifestService } from './services/manifest.service';
 
 enum Step {
@@ -23,7 +24,7 @@ type Family = 'blastrider' | 'crewrider';
 type Rider = 'driver' | 'crew' | 'light_weight';
 type Color = 'black' | 'green' | 'tan';
 type Feature = 'headrest' | 'whiplash_bar' | 'armrest' | 'footrest' | 'bms';
-type RequestKind = 'ga' | 'quote' | 'submit';
+type RequestKind = 'ga' | 'quote';
 
 @Component({
   selector: 'app-root',
@@ -83,11 +84,12 @@ export class App implements OnInit {
   // current family/rider/selection state
   family: Family = 'blastrider';
   rider: Rider | '' = '';
+  pendingRider: Rider | '' = '';
   selected = new Set<Feature>();
 
   // gallery
   galleryUrls: string[] = [];
-  requestType: RequestKind = 'submit';
+  requestTypes = new Set<RequestKind>();
 
   constructor(private fb: FormBuilder, private assets: ManifestService, private http: HttpClient) {
     this.form = this.fb.nonNullable.group({
@@ -137,8 +139,21 @@ export class App implements OnInit {
       this.triedSeatType = true;
       if (!this.canProceedFromSeatType()) return;
     }
-    // Prevent leaving BlastRider step without rider (since gallery depends on it)
-    if (this.step === Step.BlastRider && !this.rider) return;
+    // Step 3 behavior:
+    // - selecting a rider only stores a pending choice
+    // - commit rider and load images only after Next
+    if (this.step === Step.BlastRider) {
+      const nextRider = this.pendingRider || this.rider;
+      if (!nextRider) return;
+
+      const riderChanged = this.rider !== nextRider;
+      this.rider = nextRider;
+
+      if (riderChanged) {
+        this.selected.clear();
+        this.colors = 'black';
+      }
+    }
 
     if (this.step < Step.Review) {
       this.step++;
@@ -148,6 +163,10 @@ export class App implements OnInit {
   }
 
   back() {
+    if (this.step === Step.Options) {
+      this.pendingRider = this.rider;
+    }
+
     if (this.step > Step.Info) {
       this.step--;
       this.scrollTop();
@@ -156,7 +175,46 @@ export class App implements OnInit {
   }
 
   setRequestType(kind: RequestKind) {
-    this.requestType = kind;
+    if (this.requestTypes.has(kind)) {
+      this.requestTypes.delete(kind);
+      return;
+    }
+    this.requestTypes.add(kind);
+  }
+
+  isRequestTypeSelected(kind: RequestKind): boolean {
+    return this.requestTypes.has(kind);
+  }
+
+  restart() {
+    this.step = Step.Info;
+    this.triedInfo = false;
+    this.triedSeatType = false;
+    this.family = 'blastrider';
+    this.rider = '';
+    this.pendingRider = '';
+    this.selected.clear();
+    this.colors = 'black';
+    this.galleryUrls = [];
+    this.requestTypes.clear();
+
+    this.form.reset({
+      fullName: '',
+      organisation: '',
+      email: '',
+      phone: '',
+      address: '',
+      hearAbout: '',
+      contactMethod: '',
+      tellMore: '',
+      quantity: 1,
+      seatType: '',
+      riderType: '',
+      consent: false,
+    });
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
+    this.scrollTop();
   }
 
   async submit() {
@@ -173,12 +231,12 @@ export class App implements OnInit {
       color: this.colors,
       features: Array.from(this.selected),
       quantity: this.specQuantity(),
-      requestType: this.requestType,
+      requestTypes: Array.from(this.requestTypes),
     };
     try {
-      // await this.http.post('/api/send', payload).toPromise();
+      await firstValueFrom(this.http.post('/api/send', payload));
       this.step = this.Step.Success;
-      this.requestType = 'submit';
+      this.requestTypes.clear();
       this.scrollTop();
     } catch (err) {
       console.error('Email failed', err);
@@ -207,6 +265,7 @@ export class App implements OnInit {
     this.family = this.toFamily(label);
     this.form.patchValue({ seatType: label, riderType: '' });
     this.rider = '';
+    this.pendingRider = '';
     this.selected.clear();
     this.colors = 'black' as Color;
     this.galleryUrls = [];
@@ -215,10 +274,13 @@ export class App implements OnInit {
   }
 
   onRiderPick(label: string) {
-    this.rider = this.toRider(label);
-    this.selected.clear();
-    this.colors = 'black' as Color; // default color
-    this.computeGallery(); // show default images immediately after rider pick
+    this.form.controls.riderType.setValue(label);
+    this.pendingRider = this.toRider(label);
+  }
+
+  isRiderSelected(label: string): boolean {
+    const selectedRider = this.pendingRider || this.rider;
+    return selectedRider === this.toRider(label);
   }
 
   onColorPick(c: Color) {
@@ -233,8 +295,15 @@ export class App implements OnInit {
     //   Headrest & Whiplash Bar are combined assets; selecting either selects both.
     if (this.family === 'crewrider' && this.rider === 'light_weight') {
       if (f === 'headrest' || f === 'whiplash_bar') {
-        this.selected.add('headrest');
-        this.selected.add('whiplash_bar');
+        const hasHead = this.selected.has('headrest');
+        const hasWhip = this.selected.has('whiplash_bar');
+        if (hasHead && hasWhip) {
+          this.selected.delete('headrest');
+          this.selected.delete('whiplash_bar');
+        } else {
+          this.selected.add('headrest');
+          this.selected.add('whiplash_bar');
+        }
       } else {
         this.selected.has(f) ? this.selected.delete(f) : this.selected.add(f);
       }
@@ -337,9 +406,9 @@ export class App implements OnInit {
   }
 
   specRequestLabel(): string {
-    if (this.requestType === 'ga') return 'GA Drawing';
-    if (this.requestType === 'quote') return 'Quote';
-    return 'Submit';
+    const selected = Array.from(this.requestTypes).sort();
+    if (selected.length === 0) return 'Submit';
+    return selected.map((r) => (r === 'ga' ? 'GA Drawing' : 'Quote')).join(' + ');
   }
 
   adjustQty(delta: number) {
@@ -395,10 +464,8 @@ export class App implements OnInit {
     }
 
     // Options page:
-    // - BMS should still influence matching when selected (because you now want:
-    //   if the combination doesn't exist => fallback to default).
-    // - Therefore do NOT filter BMS out here.
-    const selectedOptions = [...this.selected];
+    // - BMS is a pure toggle and must not affect image matching.
+    const selectedOptions = [...this.selected].filter((f) => f !== 'bms');
 
     // If nothing selected, show defaults
     if (selectedOptions.length === 0) {

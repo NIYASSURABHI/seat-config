@@ -1,7 +1,7 @@
 <div class="page">
   <header class="topbar">
     <div class="brand-title">AAE - Seat Configurator</div>
-    <img class="brand-logo" src="/assets/logo-placeholder.svg" alt="Brand Logo" />
+    <img class="brand-logo" src="/assets/aae-logo.png" alt="Brand Logo" />
   </header>
 
   <nav class="stepper">
@@ -63,7 +63,7 @@
 
       <div class="form-row">
         <div class="form-label">How did you hear about us:</div>
-        <div class="form-field">
+        <div class="form-field form-field--select">
           <select formControlName="hearAbout">
             <option value="" disabled>Select</option>
             <option *ngFor="let h of hearAboutOptions" [value]="h">{{ h }}</option>
@@ -73,7 +73,7 @@
 
       <div class="form-row">
         <div class="form-label">Preferred Contact Method:</div>
-        <div class="form-field">
+        <div class="form-field form-field--select">
           <select formControlName="contactMethod">
             <option value="" disabled>Select</option>
             <option *ngFor="let c of contactMethodOptions" [value]="c">{{ c }}</option>
@@ -100,114 +100,183 @@
 
     <!-- STEP 2: Seat Type -->
     <section *ngIf="step === Step.SeatType" class="card card--mock seat-type-card">
-      <h2 class="card-title">Seat Type</h2>
+      <div class="side-layout side-layout--seat">
+        <aside class="side-panel">
+          <div class="fade-stack">
+            <img src="/assets/fade-images/blast-1.jpeg" alt="BlastRider seat" />
+            <img src="/assets/fade-images/blast-2.jpeg" alt="BlastRider seat" />
+          </div>
+          <div class="panel-card">
+            <p>
+              AAE's BlastRider is a protection-focused seating system engineered for specialist
+              vehicles. It supports multiple installation configurations and can integrate a Blast
+              Mitigation System (BMS) to reduce blast energy transfer to the occupant. Designed for
+              high-threat environments, BlastRider combines modular mounting options with enhanced
+              survivability features.
+            </p>
+          </div>
+        </aside>
 
-      <div class="pill-group">
-        <label class="pill-option">
-          <input
-            type="radio"
-            [checked]="form.controls.seatType.value === 'BlastRider'"
-            (change)="
-              form.controls.seatType.setValue('BlastRider');
-              triedSeatType = false;
-              onSeatTypeChange('BlastRider')
-            "
-          />
-          <span class="pill-label">BlastRider</span>
-        </label>
+        <div class="side-center">
+          <h2 class="card-title">Seat Type</h2>
 
-        <label class="pill-option">
-          <input
-            type="radio"
-            [checked]="form.controls.seatType.value === 'CrewRider'"
-            (change)="
-              form.controls.seatType.setValue('CrewRider');
-              triedSeatType = false;
-              onSeatTypeChange('CrewRider')
-            "
-          />
-          <span class="pill-label">CrewRider</span>
-        </label>
-      </div>
+          <div class="pill-group">
+            <label class="pill-option">
+              <input
+                type="radio"
+                [checked]="form.controls.seatType.value === 'BlastRider'"
+                (change)="
+                  form.controls.seatType.setValue('BlastRider');
+                  triedSeatType = false;
+                  onSeatTypeChange('BlastRider')
+                "
+              />
+              <span class="pill-label">BlastRider</span>
+            </label>
 
-      <small class="err seat-err" *ngIf="triedSeatType && !canProceedFromSeatType()">
-        Please select a seat type
-      </small>
+            <label class="pill-option">
+              <input
+                type="radio"
+                [checked]="form.controls.seatType.value === 'CrewRider'"
+                (change)="
+                  form.controls.seatType.setValue('CrewRider');
+                  triedSeatType = false;
+                  onSeatTypeChange('CrewRider')
+                "
+              />
+              <span class="pill-label">CrewRider</span>
+            </label>
+          </div>
 
-      <div class="actions actions--center mt-24">
-        <button class="btn" type="button" (click)="back()">Back</button>
-        <button
-          class="btn next"
-          type="button"
-          (click)="next()"
-          [disabled]="!canProceedFromSeatType()"
-        >
-          NEXT
-        </button>
+          <small class="err seat-err" *ngIf="triedSeatType && !canProceedFromSeatType()">
+            Please select a seat type
+          </small>
+
+          <div class="actions actions--center mt-24">
+            <button class="btn" type="button" (click)="back()">Back</button>
+            <button
+              class="btn next"
+              type="button"
+              (click)="next()"
+              [disabled]="!canProceedFromSeatType()"
+            >
+              NEXT
+            </button>
+          </div>
+        </div>
+
+        <aside class="side-panel">
+          <div class="fade-stack">
+            <img src="/assets/fade-images/crew-1.jpeg" alt="CrewRider seat" />
+            <img src="/assets/fade-images/crew-2.jpeg" alt="CrewRider seat" />
+          </div>
+          <div class="panel-card">
+            <p>
+              AAE's CrewRider is a lightweight, modular seating solution for specialist vehicle
+              interiors. Available in jump-seat and driver/commander variants, it offers compact
+              folding options and adaptable mounting to support efficient crew layouts. CrewRider
+              prioritizes flexibility and space optimization for everyday mission profiles.
+            </p>
+          </div>
+        </aside>
       </div>
     </section>
 
-    <!-- STEP 3: BlastRider (rider, immediate gallery & colors) -->
+    <!-- STEP 3: Variant -->
     <section
       *ngIf="step === Step.BlastRider"
-      class="card card--mock rider-card"
-      [ngClass]="{ 'rider-empty': !rider }"
+      class="card card--mock rider-card rider-empty"
     >
-      <h2 class="card-title">{{ form.controls.seatType.value }}</h2>
+      <div class="side-layout side-layout--variant">
+        <aside class="side-panel">
+          <div class="fade-stack">
+            <img
+              *ngIf="family === 'blastrider'"
+              src="/assets/fade-images/blast-1.jpeg"
+              alt="BlastRider seat"
+            />
+            <img
+              *ngIf="family === 'crewrider'"
+              src="/assets/fade-images/crew-1.jpeg"
+              alt="CrewRider seat"
+            />
+          </div>
+          <div class="panel-card" *ngIf="family === 'blastrider'">
+            <p>
+              The BlastRider Driver seat integrates a full Blast Mitigation System (BMS) housed
+              within a purpose-built structural frame. It can be configured with multiple comfort
+              and safety features, including a headrest, whiplash bar, and armrests tailored for
+              long-duration missions. This variant delivers high protection while supporting the
+              driver's ergonomic and operational needs.
+            </p>
+          </div>
+          <div class="panel-card" *ngIf="family === 'crewrider'">
+            <p>
+              AAE's CrewRider Driver/Commander is a modular seating system designed for operator
+              positions in specialist vehicles. It features a padded seat and backrest mounted on a
+              durable frame with flexible installation options. Available enhancements include a
+              headrest, whiplash bar, and armrests, providing ergonomic support for extended mission
+              durations.
+            </p>
+          </div>
+        </aside>
 
-      <!-- rider pills -->
-      <div class="pill-group">
-        <label class="pill-option" *ngFor="let r of riderChoicesForCurrentFamily()">
-          <input
-            type="radio"
-            name="rider"
-            [checked]="rider === r.toLowerCase().replace(' ', '_')"
-            (change)="form.controls.riderType.setValue(r); onRiderPick(r)"
-          />
-          <span class="pill-label">{{ r }}</span>
-        </label>
-      </div>
+        <div class="side-center">
+          <h2 class="card-title">{{ form.controls.seatType.value }}</h2>
 
-      <div *ngIf="rider">
-        <div class="gallery" *ngIf="galleryUrls.length > 0">
-          <img *ngFor="let url of galleryUrls" [src]="url" alt="seat image" />
-        </div>
-
-        <div class="color-row">
-          <div class="color-dots">
-            <button
-              type="button"
-              class="dot"
-              [class.active]="colors === 'black'"
-              (click)="onColorPick('black')"
-              aria-label="Black"
-            ></button>
-            <button
-              type="button"
-              class="dot sand"
-              [class.active]="colors === 'tan'"
-              (click)="onColorPick('tan')"
-              aria-label="Tan"
-            ></button>
-            <button
-              type="button"
-              class="dot green"
-              [class.active]="colors === 'green'"
-              (click)="onColorPick('green')"
-              aria-label="Green"
-            ></button>
+          <!-- rider pills -->
+          <div class="pill-group">
+            <label class="pill-option" *ngFor="let r of riderChoicesForCurrentFamily()">
+              <input
+                type="radio"
+                name="rider"
+                [checked]="isRiderSelected(r)"
+                (change)="onRiderPick(r)"
+              />
+              <span class="pill-label">{{ r }}</span>
+            </label>
           </div>
 
-          <div class="actions actions--center">
+          <div class="actions actions--center mt-24 rider-actions-empty">
             <button class="btn" type="button" (click)="back()">Back</button>
-            <button class="btn next" type="button" (click)="next()">Next</button>
+            <button class="btn next" type="button" (click)="next()">
+              Next
+            </button>
           </div>
         </div>
-      </div>
 
-      <div class="actions actions--center mt-24 rider-actions-empty" *ngIf="!rider">
-        <button class="btn" type="button" (click)="back()">Back</button>
-        <button class="btn next" type="button" [disabled]="true">Next</button>
+        <aside class="side-panel">
+          <div class="fade-stack">
+            <img
+              *ngIf="family === 'blastrider'"
+              src="/assets/fade-images/blast-2.jpeg"
+              alt="BlastRider seat"
+            />
+            <img
+              *ngIf="family === 'crewrider'"
+              src="/assets/fade-images/crew-2.jpeg"
+              alt="CrewRider seat"
+            />
+          </div>
+          <div class="panel-card" *ngIf="family === 'blastrider'">
+            <p>
+              The BlastRider Crew seat is a blast-protected seating system designed for dismount
+              crew positions and includes a fully integrated Blast Mitigation System (BMS). It can
+              be configured with multiple comfort and safety features, including a headrest,
+              whiplash bar, and footrest. This variant provides robust occupant protection while
+              supporting efficient cabin layouts for multi-role crew operations.
+            </p>
+          </div>
+          <div class="panel-card" *ngIf="family === 'crewrider'">
+            <p>
+              AAE's CrewRider Crew is a compact, modular seating solution designed for interior crew
+              positions in specialist vehicles. It features a fabric seat and backrest with
+              adaptable mounting options and a folding mechanism that keeps the cabin clear when
+              stowed. Available enhancements include a headrest and whiplash bar, supporting
+              efficient layouts and unobstructed crew movement.
+            </p>
+          </div>
+        </aside>
       </div>
     </section>
 
@@ -228,8 +297,8 @@
               f === 'whiplash_bar'
                 ? 'Whiplash Bar'
                 : f === 'bms'
-                ? 'BMS'
-                : (f | titlecase).replace('_', ' ')
+                  ? 'BMS'
+                  : (f | titlecase).replace('_', ' ')
             }}
           </span>
         </label>
@@ -293,7 +362,6 @@
           <div class="spec-line"><strong>Seat Belt:</strong> {{ specSeatBelt() }}</div>
           <div class="spec-line"><strong>Fabric:</strong> {{ specFabric() }}</div>
           <div class="spec-line"><strong>Colour:</strong> {{ specColour() }}</div>
-          <div class="spec-line"><strong>Request:</strong> {{ specRequestLabel() }}</div>
           <div class="quantity-row">
             <div class="spec-line"><strong>Quantity:</strong></div>
             <div class="qty-controls">
@@ -317,10 +385,21 @@
       </div>
 
       <div class="review-actions">
-        <button class="btn" type="button" (click)="setRequestType('ga')">
+        <button class="btn" type="button" (click)="back()">Back</button>
+        <button
+          class="btn"
+          [class.btn--selected]="isRequestTypeSelected('ga')"
+          type="button"
+          (click)="setRequestType('ga')"
+        >
           Request for GA Drawing
         </button>
-        <button class="btn" type="button" (click)="setRequestType('quote')">
+        <button
+          class="btn"
+          [class.btn--selected]="isRequestTypeSelected('quote')"
+          type="button"
+          (click)="setRequestType('quote')"
+        >
           Request for Quote
         </button>
         <button class="btn next" type="button" (click)="submit()">Submit</button>
@@ -334,7 +413,7 @@
         will contact you shortly.
       </div>
       <div class="actions actions--center mt-24">
-        <button class="btn" type="button">Explore Other Options</button>
+        <button class="btn" type="button" (click)="restart()">Explore Other Options</button>
       </div>
     </section>
   </form>
