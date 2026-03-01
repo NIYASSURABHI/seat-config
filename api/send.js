@@ -1,12 +1,8 @@
-import { Resend } from 'resend';
+const { Resend } = require('resend');
 
-type VercelRequest = { method?: string; body?: any };
-type VercelResponse = { status: (code: number) => { json: (body: any) => void } };
-declare const process: any;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const resend = new Resend(process?.env?.RESEND_API_KEY);
-
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const {
@@ -31,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const labels =
     Array.isArray(requestTypes) && requestTypes.length
-      ? requestTypes.map((r: string) => (r === 'ga' ? 'GA Drawing' : 'Quote'))
+      ? requestTypes.map((r) => (r === 'ga' ? 'GA Drawing' : 'Quote'))
       : [];
   const reqLabel = labels.length ? labels.join(' + ') : 'No requests';
 
@@ -49,16 +45,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     <p>Type: ${seatType}</p>
     <p>Variant: ${riderType || '-'}</p>
     ${(Array.isArray(features) && features.length ? features : ['None'])
-      .map((f: string) => `<p>${f}</p>`)
+      .map((f) => `<p>${f}</p>`)
       .join('')}
     <p>Colour: ${color || '-'}</p>
     <p>Quantity: ${quantity ?? '-'}</p>
-    <p>Optional Comments: ${tellMore ? (tellMore + '').replace(/\n/g, '<br/>') : '-'}</p>
+    <p>Optional Comments: ${tellMore ? String(tellMore).replace(/\n/g, '<br/>') : '-'}</p>
   `;
 
   const { error } = await resend.emails.send({
-    from: process?.env?.FROM_EMAIL,
-    to: process?.env?.TO_EMAIL,
+    from: process.env.FROM_EMAIL,
+    to: process.env.TO_EMAIL,
     replyTo: email,
     subject: `Seat Configurator – ${reqLabel} – ${seatType}${riderType ? ' / ' + riderType : ''}`,
     html,
@@ -66,4 +62,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (error) return res.status(502).json({ error: error.message });
   return res.status(200).json({ ok: true });
-}
+};
