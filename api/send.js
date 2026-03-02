@@ -1,6 +1,8 @@
 const { Resend } = require('resend');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const TO_RECIPIENTS = ['mmeharoof@armoureng.com ', 'niyas1792@gmail.com'];
+const CC_RECIPIENTS = ['ohall@armoureng.com'];
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -54,7 +56,8 @@ module.exports = async function handler(req, res) {
 
   const { error } = await resend.emails.send({
     from: process.env.FROM_EMAIL,
-    to: process.env.TO_EMAIL,
+    to: TO_RECIPIENTS,
+    cc: CC_RECIPIENTS,
     replyTo: email,
     subject: `Seat Configurator – ${reqLabel} – ${seatType}${riderType ? ' / ' + riderType : ''}`,
     html,
